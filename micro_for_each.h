@@ -162,7 +162,7 @@
 // -->
 // MACRO(1); MACRO(2); MACRO(3); MACRO(4)
  
-#define CHAIN_CALL(call, arg, ...) call(FOR_EACH(op, ., arg, ##__VA_ARGS__))
+#define CHAIN_CALL(call, arg, ...) FOR_EACH(call, ., arg, ##__VA_ARGS__)
 // CHAIN_CALL(MACRO, 1, 2, 3, 4)
 // -->
 // MACRO(1).MACRO(2).MACRO(3).MACRO(4)
