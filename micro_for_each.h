@@ -135,37 +135,87 @@
 #define ARG_COUNT(...) ARG_COUNT_(__VA_ARGS__, ARG_SEQ())
 #define ARG_OP(...) MACRO_CONCAT(ARG_OP_, ARG_COUNT(__VA_ARGS__))
  
-#define FOR_EACH(op, sep, arg, ...) ARG_OP(arg, ##__VA_ARGS__)(op, sep, arg, ##__VA_ARGS__)
+#define FOR_EACH(op, sep, ...) ARG_OP(EXPAND_(__VA_ARGS__))(op, sep, ##__VA_ARGS__)
  
 #define ARG_COMMA ,
-#define FOR_EACH_COMMA(op, arg, ...) ARG_OP(arg, ##__VA_ARGS__)(op, ARG_COMMA, arg, ##__VA_ARGS__)
+#define FOR_EACH_COMMA(op, ...) ARG_OP(EXPAND_(__VA_ARGS__))(op, ARG_COMMA, ##__VA_ARGS__)
 // FOR_EACH_COMMA(MACRO, 1, 2, 3, 4)
 // -->
 // MICRO(1),MICRO(2),MICRO(3),MICRO(4)
  
-#define WRAP_CALL(call, op, arg, ...) call(FOR_EACH_COMMA(op, arg, ##__VA_ARGS__))
+#define WRAP_CALL(call, op, ...) call(FOR_EACH_COMMA(op, ##__VA_ARGS__))
 // WRAP_CALL(call, MACRO, 1, 2, 3, 4)
 // -->
 // call(MACRO(1), MACRO(2), MACRO(3), MACRO(4))
  
 // cannot use FOR_EACH on gcc and clang, why?
-#define WRAP_CALL1(call, op, arg, ...) ARG_OP(arg, ##__VA_ARGS__)(op, ARG_COMMA, arg, ##__VA_ARGS__)
+#define WRAP_CALL1(call, op, ...) ARG_OP(EXPAND_(__VA_ARGS__))(op, ARG_COMMA, ##__VA_ARGS__)
 
  
-#define SEPERATOR_ARGS(sep, arg, ...) FOR_EACH(EXPAND_, sep, arg, ##__VA_ARGS__)
+#define SEPERATOR_ARGS(sep, ...) FOR_EACH(EXPAND_, sep, ##__VA_ARGS__)
 // std::cout <<  SEPERATOR_ARGS(<<, 1, 2, 3, std::endl)
 //           -->
 // std::cout <<  1 << 2 << 3 << std::endl
  
-#define FOR_EACH_CALL(call, arg, ...) FOR_EACH(call, ;, arg, ##__VA_ARGS__)
+#define FOR_EACH_CALL(call, ...) FOR_EACH(call, ;, ##__VA_ARGS__)
 // ARG_OP_CALL(MACRO, 1, 2, 3, 4)
 // -->
 // MACRO(1); MACRO(2); MACRO(3); MACRO(4)
  
-#define CHAIN_CALL(call, arg, ...) FOR_EACH(call, ., arg, ##__VA_ARGS__)
+#define CHAIN_CALL(call,...) FOR_EACH(call, ., ##__VA_ARGS__)
 // CHAIN_CALL(MACRO, 1, 2, 3, 4)
 // -->
 // MACRO(1).MACRO(2).MACRO(3).MACRO(4)
 // clang-format on
 
+#endif
+#if 0
+#include <iostream>
+template<typename T>
+T print(const char* name, const T& t) {
+    std::cout << name << "=" << t << std::endl;
+    return t;
+}
+#define PRINT(a) print(#a, a)
+template<typename T>
+T same(T t) {
+    return t;
+}
+int sum() {
+    return 0;
+}
+template<typename T, typename... Args>
+T sum(T t, Args... args) {
+    return t + sum(args...);
+}
+#define TO_STRING_(a) #a
+#define TO_STRING(a) TO_STRING_(a)
+#define SUM(...) print(TO_STRING(SEPERATOR_ARGS(+,__VA_ARGS__)), sum(__VA_ARGS__))
+int main() {
+    std::cout << SEPERATOR_ARGS(<<, 1, 2, 3, 4, std::endl);
+
+    std::cout << FOR_EACH(same, +, 1) << std::endl;
+
+    std::cout << WRAP_CALL(sum, PRINT, 1, 2, 3, 4) << std::endl;
+
+    std::cout << WRAP_CALL(SUM, PRINT, 1, 2, 3, 4);
+
+    return 0;
+}
+
+/*
+-->
+
+int main() {
+    std::cout << 1 << 2 << 3 << 4 << std::endl;
+   
+    std::cout << same(1) << std::endl;
+
+    std::cout << sum(print("1", 1) , print("2", 2) , print("3", 3) , print("4", 4)) << std::endl;
+
+    std::cout << print("print(\"1\", 1) + print(\"2\", 2) + print(\"3\", 3) + print(\"4\", 4)", sum(print("1", 1) , print("2", 2) , print("3", 3) , print("4", 4)));
+
+    return 0;
+}
+*/
 #endif
