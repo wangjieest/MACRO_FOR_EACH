@@ -4,9 +4,13 @@ preprocess each variable with comma seperator
 ```
 // FOR_EACH_COMMA(MACRO, 1, 2, 3, 4)
 // -->
-// MICRO(1),MICRO(2),MICRO(3),MICRO(4)
+// MACRO(1),MACRO(2),MACRO(3),MACRO(4)
 ```
-
+```
+// FOR_EACH_COMMA(MACRO)
+// -->
+// 
+```
 
 wrap above with a new macro
 ```
