@@ -1,36 +1,4 @@
-#ifndef MACRO_FOR_EACH_IMPL
-#define MACRO_FOR_EACH_IMPL
-
-// clang-format off
-#define ARG_OP_1(op, sep, arg     )  op(arg)
-#define ARG_OP_2(op, sep, arg, ...)  op(arg) sep  EXPAND_(ARG_OP_1(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_3(op, sep, arg, ...)  op(arg) sep  EXPAND_(ARG_OP_2(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_4(op, sep, arg, ...)  op(arg) sep  EXPAND_(ARG_OP_3(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_5(op, sep, arg, ...)  op(arg) sep  EXPAND_(ARG_OP_4(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_6(op, sep, arg, ...)  op(arg) sep  EXPAND_(ARG_OP_5(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_7(op, sep, arg, ...)  op(arg) sep  EXPAND_(ARG_OP_6(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_8(op, sep, arg, ...)  op(arg) sep  EXPAND_(ARG_OP_7(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_9(op, sep, arg, ...)  op(arg) sep  EXPAND_(ARG_OP_8(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_10(op, sep, arg, ...) op(arg) sep  EXPAND_(ARG_OP_9(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_11(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_10(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_12(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_11(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_13(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_12(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_14(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_13(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_15(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_14(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_16(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_15(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_16(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_15(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_17(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_16(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_18(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_17(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_19(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_18(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_20(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_19(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_21(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_20(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_22(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_21(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_23(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_22(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_24(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_23(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_25(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_24(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_26(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_25(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_27(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_26(op, EXPAND_(sep), ##__VA_ARGS__))
-#define ARG_OP_28(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_27(op, EXPAND_(sep), ##__VA_ARGS__))
+7(op, EXPAND_(sep), ##__VA_ARGS__))
 #define ARG_OP_29(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_28(op, EXPAND_(sep), ##__VA_ARGS__))
 #define ARG_OP_30(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_29(op, EXPAND_(sep), ##__VA_ARGS__))
 #define ARG_OP_31(op, sep, arg, ...) op(arg) sep EXPAND_(ARG_OP_30(op, EXPAND_(sep), ##__VA_ARGS__))
@@ -132,90 +100,86 @@
 #define EXPAND_(...) __VA_ARGS__
  
 #define ARG_COUNT_(...) EXPAND_(ARG_N(__VA_ARGS__))
+#define ARG_COUNT_TEST(...) EXPAND_(ARG_COUNT_(__VA_ARGS__, ARG_SEQ()))
+ 
+#if ARG_COUNT_TEST(1,1) != 2
+#error "ARG_COUNT_TEST(1,1) != 2"
+#endif
+#if ARG_COUNT_TEST(1) != 1
+#error "ARG_COUNT_TEST(1) != 1"
+#endif
+ 
+#if ARG_COUNT_TEST() == 0 
 #define ARG_COUNT(...) ARG_COUNT_(__VA_ARGS__, ARG_SEQ())
+#else
+#define MACRO_END_OF_ARGUMENTS_() 0
+#define MACRO_PROBE() ~,1
+#define MACRO_NOT_0 MACRO_PROBE()
+#define MACRO_FIRST(first, ...) first
+#define MACRO_SECOND(first, second, ...) second
+#define MACRO_IS_PROBE(...) EXPAND_(MACRO_SECOND(__VA_ARGS__, 0))
+#define MACRO_NOT(x) MACRO_IS_PROBE(MACRO_CONCAT(MACRO_NOT_, x))
+#define MACRO_BOOL_(x) MACRO_NOT(MACRO_NOT(x))
+#define MACRO_HAS_ARGS(...) EXPAND_(MACRO_BOOL_(MACRO_FIRST(MACRO_END_OF_ARGUMENTS_ __VA_ARGS__)()))
+ 
+#if MACRO_HAS_ARGS() != 0
+#error "MACRO_HAS_ARGS() != 0"
+#endif
+#if MACRO_HAS_ARGS(1) != 1
+#error "MACRO_HAS_ARGS(1) != 1"
+#endif
+ 
+#define MACRO_IIF_1_ELSE(...)
+#define MACRO_IIF_0_ELSE(...) __VA_ARGS__
+#define MACRO_IIF_1(...) __VA_ARGS__ MACRO_IIF_1_ELSE
+#define MACRO_IIF_0(...) MACRO_IIF_0_ELSE
+#define MACRO_IIF_ELSE_(COND) MACRO_CONCAT(MACRO_IIF_, COND)
+#define MACRO_IIF_ELSE(COND) MACRO_IIF_ELSE_(MACRO_BOOL_(COND))
+#define ARG_COUNT(...) MACRO_IIF_ELSE_(MACRO_HAS_ARGS(__VA_ARGS__))(ARG_COUNT_TEST(__VA_ARGS__))(0)
+#endif
+ 
+#if ARG_COUNT() != 0
+#error "ARG_COUNT() != 0"
+#endif
+#if ARG_COUNT(1,1) != 2
+#error "ARG_COUNT(1,1) != 2"
+#endif
+#if ARG_COUNT(1) != 1
+#error "ARG_COUNT(1) != 1"
+#endif
+ 
 #define ARG_OP(...) MACRO_CONCAT(ARG_OP_, ARG_COUNT(__VA_ARGS__))
  
-#define FOR_EACH(op, sep, ...) ARG_OP(EXPAND_(__VA_ARGS__))(op, sep, ##__VA_ARGS__)
+#define MACRO_FOR_EACH(op, sep, ...) EXPAND_(ARG_OP(EXPAND_(__VA_ARGS__))(op, sep, ##__VA_ARGS__))
  
 #define ARG_COMMA ,
-#define FOR_EACH_COMMA(op, ...) ARG_OP(EXPAND_(__VA_ARGS__))(op, ARG_COMMA, ##__VA_ARGS__)
+#define FOR_EACH_COMMA(op, ...) EXPAND_(ARG_OP(EXPAND_(__VA_ARGS__))(op, ARG_COMMA, ##__VA_ARGS__))
 // FOR_EACH_COMMA(MACRO, 1, 2, 3, 4)
 // -->
 // MICRO(1),MICRO(2),MICRO(3),MICRO(4)
  
-#define WRAP_CALL(call, op, ...) call(FOR_EACH_COMMA(op, ##__VA_ARGS__))
+#define WRAP_CALL(call, op, ...) call(EXPAND_(FOR_EACH_COMMA(op, ##__VA_ARGS__)))
 // WRAP_CALL(call, MACRO, 1, 2, 3, 4)
 // -->
 // call(MACRO(1), MACRO(2), MACRO(3), MACRO(4))
  
-// cannot use FOR_EACH on gcc and clang, why?
-#define WRAP_CALL1(call, op, ...) ARG_OP(EXPAND_(__VA_ARGS__))(op, ARG_COMMA, ##__VA_ARGS__)
-
+// cannot use MACRO_FOR_EACH on gcc and clang?
+#define WRAP_CALL1(call, op, ...) EXPAND_(ARG_OP(EXPAND_(__VA_ARGS__))(op, ARG_COMMA, ##__VA_ARGS__))
  
-#define SEPERATOR_ARGS(sep, ...) FOR_EACH(EXPAND_, sep, ##__VA_ARGS__)
+#define SEPERATOR_ARGS(sep, ...) EXPAND_(MACRO_FOR_EACH(EXPAND_, sep, ##__VA_ARGS__))
 // std::cout <<  SEPERATOR_ARGS(<<, 1, 2, 3, std::endl)
-//           -->
+//               -->
 // std::cout <<  1 << 2 << 3 << std::endl
  
-#define FOR_EACH_CALL(call, ...) FOR_EACH(call, ;, ##__VA_ARGS__)
-// ARG_OP_CALL(MACRO, 1, 2, 3, 4)
+#define FOR_EACH_CALL(call, ...) EXPAND_(MACRO_FOR_EACH(call, ;, ##__VA_ARGS__))
+// FOR_EACH_CALL(MACRO, 1, 2, 3, 4)
 // -->
 // MACRO(1); MACRO(2); MACRO(3); MACRO(4)
  
-#define CHAIN_CALL(call,...) FOR_EACH(call, ., ##__VA_ARGS__)
+#define CHAIN_CALL(call,...) EXPAND_(MACRO_FOR_EACH(call, ., ##__VA_ARGS__))
 // CHAIN_CALL(MACRO, 1, 2, 3, 4)
 // -->
 // MACRO(1).MACRO(2).MACRO(3).MACRO(4)
 // clang-format on
-
-#endif
-#if 0
-#include <iostream>
-template<typename T>
-T print(const char* name, const T& t) {
-    std::cout << name << "=" << t << std::endl;
-    return t;
-}
-#define PRINT(a) print(#a, a)
-template<typename T>
-T same(T t) {
-    return t;
-}
-int sum() {
-    return 0;
-}
-template<typename T, typename... Args>
-T sum(T t, Args... args) {
-    return t + sum(args...);
-}
-#define TO_STRING_(a) #a
-#define TO_STRING(a) TO_STRING_(a)
-#define SUM(...) print(TO_STRING(SEPERATOR_ARGS(+,__VA_ARGS__)), sum(__VA_ARGS__))
-int main() {
-    std::cout << SEPERATOR_ARGS(<<, 1, 2, 3, 4, std::endl);
-
-    std::cout << FOR_EACH(same, +, 1) << std::endl;
-
-    std::cout << WRAP_CALL(sum, PRINT, 1, 2, 3, 4) << std::endl;
-
-    std::cout << WRAP_CALL(SUM, PRINT, 1, 2, 3, 4);
-
-    return 0;
-}
-
-/*
--->
-
-int main() {
-    std::cout << 1 << 2 << 3 << 4 << std::endl;
-   
-    std::cout << same(1) << std::endl;
-
-    std::cout << sum(print("1", 1) , print("2", 2) , print("3", 3) , print("4", 4)) << std::endl;
-
-    std::cout << print("print(\"1\", 1) + print(\"2\", 2) + print(\"3\", 3) + print(\"4\", 4)", sum(print("1", 1) , print("2", 2) , print("3", 3) , print("4", 4)));
-
-    return 0;
-}
-*/
+ 
 #endif
